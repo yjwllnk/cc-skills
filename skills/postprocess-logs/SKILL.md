@@ -30,6 +30,28 @@ PROJ_DIR="$HOME/.claude-dnjf/projects/-home-jinvk--claude-dnjf"
 SESSION_JSONL="$(ls -t "$PROJ_DIR"/*.jsonl 2>/dev/null | head -1)"
 mkdir -p "$WDIR/logs"
 
+# 1b. Rotate any existing log artifacts so this run never overwrites a prior run.
+#     Moves session.jsonl/session.txt/summary.md/prompts.txt (if present) into
+#     logs/prev-<UTC-timestamp>/. Skips if none of the four files exist.
+rotate_prev_logs() {
+  local logs_dir="$1"
+  local found=0
+  for f in session.jsonl session.txt summary.md prompts.txt; do
+    [ -e "$logs_dir/$f" ] && found=1 && break
+  done
+  if [ "$found" -eq 1 ]; then
+    local ts
+    ts="$(date -u +%Y%m%dT%H%M%SZ)"
+    local archive="$logs_dir/prev-$ts"
+    mkdir -p "$archive"
+    for f in session.jsonl session.txt summary.md prompts.txt; do
+      [ -e "$logs_dir/$f" ] && mv "$logs_dir/$f" "$archive/"
+    done
+    echo "rotated prior logs -> $archive"
+  fi
+}
+rotate_prev_logs "$WDIR/logs"
+
 # 2. Copy raw transcript
 cp "$SESSION_JSONL" "$WDIR/logs/session.jsonl"
 ```
@@ -114,3 +136,4 @@ Verify with `ls -la "$WDIR/logs/"` before reporting completion.
 - The CLAUDE.md in `WDIR/` only contains a one-line pointer to this skill. Full procedure lives here so it does not load on every turn.
 - Memory file `feedback_postprocess_logs.md` reminds you this is required. Do not remove it.
 - Tool-result truncation at 500 chars in `session.txt` is intentional — keeps the file readable. Raw `session.jsonl` preserves everything.
+- Prior-run artifacts are auto-rotated into `logs/prev-<UTC-timestamp>/` by `rotate_prev_logs` (step 1b) so re-running never overwrites earlier output. Clean these up manually when no longer needed.
