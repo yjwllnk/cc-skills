@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "jinvk-skills",
+  "name": "cc-skills",
   "description": "Personal Claude Code skills for HPC / WDIR-based workflows.",
   "owner": {
     "name": "yjwllnk",
@@ -8,7 +8,7 @@
   },
   "plugins": [
     {
-      "name": "jinvk-skills",
+      "name": "cc-skills",
       "description": "Bundle of personal skills (postprocess-logs, ...) used across HPC clusters and dev devices.",
       "source": "./",
       "category": "productivity"

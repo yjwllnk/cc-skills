@@ -1,6 +1,6 @@
-# jinvk-skills
+# cc-skills
 
-Personal Claude Code skill bundle. Ships across machines via the plugin marketplace mechanism so behavior stays consistent on every HPC / dev box.
+Personal Claude Code skill bundle. Distributed via the plugin marketplace mechanism so behavior stays consistent across HPC / dev machines.
 
 ## Skills included
 
@@ -10,26 +10,36 @@ Personal Claude Code skill bundle. Ships across machines via the plugin marketpl
 
 ## Install on a new machine
 
-Once this repo is on GitHub at `yjwllnk/jinvk-skills`:
+Repo is private, so use the SSH URL form. The device must have an SSH key registered with GitHub:
 
 ```text
-/plugin marketplace add yjwllnk/jinvk-skills
-/plugin install jinvk-skills@jinvk-skills
+/plugin marketplace add git@github.com:yjwllnk/cc-skills.git
+/plugin install cc-skills@cc-skills
 ```
 
-The marketplace and plugin share the same repo (`source: "./"` in `marketplace.json`), so a single repo serves both roles — same pattern as `caveman` and `tkm`.
+Restart Claude Code after install for skill auto-discovery.
+
+## Pre-install device check
+
+Run this one-liner before `/plugin marketplace add`. Prints `On spot ...` if SSH to GitHub works, otherwise prints the underlying error:
+
+```bash
+ssh -T -o BatchMode=yes git@github.com 2>&1 | grep -q "successfully authenticated" && echo "On spot ..." || echo "SSH to GitHub failed — set up key first"
+```
+
+GitHub itself prints `Hi <user>! You've successfully authenticated...`; that string is server-controlled and cannot be customized. The wrapper above swallows it and prints `On spot ...` instead.
 
 ## Update flow
 
 1. Edit `skills/<name>/SKILL.md` locally.
 2. Bump `version` in `.claude-plugin/plugin.json` (semver).
 3. `git commit && git push`.
-4. On other devices: `/plugin update jinvk-skills@jinvk-skills`.
+4. On other devices: `/plugin update cc-skills@cc-skills`.
 
 ## Layout
 
 ```
-jinvk-skills/
+cc-skills/
 ├── .claude-plugin/
 │   ├── marketplace.json
 │   └── plugin.json
@@ -38,8 +48,3 @@ jinvk-skills/
 │       └── SKILL.md
 └── README.md
 ```
-
-## Notes
-
-- Skills auto-discover at session start; restart Claude Code after install.
-- Trigger phrases for `postprocess-logs` are listed in its SKILL.md frontmatter `description` so Claude can match user intent.
