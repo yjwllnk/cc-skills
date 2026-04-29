@@ -1,7 +1,7 @@
 {
   "name": "cc-skills",
-  "version": "0.1.0",
-  "description": "Personal skill bundle. Currently ships postprocess-logs (writes session.jsonl + session.txt + summary.md + prompts.txt into <WDIR>/logs/ at end of every workflow).",
+  "version": "0.2.0",
+  "description": "Personal skill bundle. Currently ships postprocess-logs (writes session.jsonl + session.txt + summary.md + prompts.txt into <WDIR>/logs/ at end of every workflow). Works for Claude Code and OpenAI Codex CLI sessions.",
   "author": {
     "name": "yjwllnk",
     "url": "https://github.com/yjwllnk"

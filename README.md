@@ -6,9 +6,11 @@ Personal Claude Code skill bundle. Distributed via the plugin marketplace mechan
 
 | Skill | What it does |
 |---|---|
-| `postprocess-logs` | At end of every workflow, write `<WDIR>/logs/{session.jsonl,session.txt,summary.md,prompts.txt}`. Required step before declaring any non-trivial task complete. |
+| `postprocess-logs` | At end of every workflow, write `<WDIR>/logs/{session.jsonl,session.txt,summary.md,prompts.txt}`. Required step before declaring any non-trivial task complete. Handles both Claude Code transcripts and OpenAI Codex CLI rollouts. |
 
 ## Install on a new machine
+
+### Claude Code (native plugin)
 
 Repo is private, so use the SSH URL form. The device must have an SSH key registered with GitHub:
 
@@ -18,6 +20,27 @@ Repo is private, so use the SSH URL form. The device must have an SSH key regist
 ```
 
 Restart Claude Code after install for skill auto-discovery.
+
+### OpenAI Codex CLI
+
+Codex does not load Claude plugins, but it reads `AGENTS.md` files. To make `postprocess-logs` available inside a Codex run, clone the repo somewhere stable and add a pointer to your project (or global) `AGENTS.md`:
+
+```bash
+git clone git@github.com:yjwllnk/cc-skills.git ~/cc-skills
+```
+
+Then in the project's `AGENTS.md` (or `~/.codex/AGENTS.md` for global):
+
+```markdown
+## Postprocess at end of run
+
+Before declaring any non-trivial task complete, follow the procedure in
+`~/cc-skills/skills/postprocess-logs/SKILL.md`. It writes
+`<WDIR>/logs/{session.jsonl,session.txt,summary.md,prompts.txt}` from the
+current Codex rollout under `~/.codex/sessions/`.
+```
+
+The skill's Python converter auto-detects whether the source jsonl is a Claude Code transcript or a Codex rollout, so the same SKILL.md works for both hosts.
 
 ## Pre-install device check
 
