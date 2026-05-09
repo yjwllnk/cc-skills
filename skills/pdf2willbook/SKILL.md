@@ -102,8 +102,9 @@ Do not change without an explicit reason.
 
 **Two-column (multicol, not twocolumn class option):**
 - `preamble.tex` must load `\usepackage[tikz,lecturenotes,physics]{wlltex0}` — this pulls in `multicol`, sets `\columnsep=1em`, `\columnseprule=0.05em`.
-- **Every chapter body** wraps its content in `\begin{multicols}{2}...\end{multicols}`.
-- Wide figures/tables that need the full page width: break out with `\end{multicols}` before, `\begin{multicols}{2}` after. Never use `figure*` — it does not work with the `multicol` package.
+- Also add `\usepackage{wrapfig}` to `preamble.tex` for inline wrap figures.
+- **Every chapter body** wraps its content in `\begin{multicols}{2}\raggedcolumns...\end{multicols}`.
+- Figures always stay inside multicols. Only full-page-wide **tables** break out. Never use `figure*` — undefined inside `multicol`.
 
 **fancyhdr (copy from qchem exactly):**
 ```latex
@@ -192,17 +193,100 @@ One chapter per trigger. Confirm source PDF before writing.
 - **Every figure** in the lecture notes must be extracted and included — no exceptions.
 - Workflow per figure:
   1. Identify the figure on the slide (use vision to isolate it if possible).
-  2. Save the extracted image as `figures/chNN-fig<M>.<ext>` (png preferred).
-  3. Include in TeX:
-     ```latex
-     \begin{figure}[H]
-       \centering
-       \includegraphics[width=\linewidth]{figures/chNN-figM.png}
-       \caption{<caption from slide, or descriptive if none>}
-       \label{fig:chNN-figM}
-     \end{figure}
-     ```
-  4. If figure is too wide for one multicol column: break out of multicols, include full-width, resume multicols.
+  2. Save extracted image as `figures/lec<NN>/p<M>.png` (png preferred; match comp.chem naming convention).
+  3. Include in TeX using the width and layout rules below.
+
+#### Figure width decision
+
+Figures always stay **inside** `multicols`. `\linewidth` inside multicol = one column width — use that as the reference.
+
+| Content type | Width | When |
+|---|---|---|
+| Small icon / simple schematic | `0.3–0.5\linewidth` | Tiny diagram, arrow diagram, symbol |
+| Medium diagram | `0.7\linewidth` | Moderate detail, fits comfortably in half column |
+| Standard figure | `0.85–0.9\linewidth` | Most slide figures — default choice |
+| Dense / detailed figure | `0.95\linewidth` | Lots of labels, crowded content |
+
+Default to `0.9\linewidth` when unsure. Never use `1.0\linewidth` — leaves no breathing room inside the column.
+
+#### Single figure (standard)
+
+```latex
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/lec01/p03.png}
+  \caption{<caption from slide, or descriptive if none>}
+  \label{fig:lec01-p03}
+\end{figure}
+```
+
+#### Multi-panel slide — subfigure side-by-side
+
+When a slide contains 2–3 related panels: extract each panel as a separate image, then compose with `subcaption`:
+
+```latex
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/lec01/p05a.png}
+    \caption{Left panel label}
+    \label{fig:lec01-p05a}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/lec01/p05b.png}
+    \caption{Right panel label}
+    \label{fig:lec01-p05b}
+  \end{subfigure}
+  \caption{Overall slide caption.}
+  \label{fig:lec01-p05}
+\end{figure}
+```
+
+For 3 panels use `0.31\linewidth` each with `\hfill` between.
+
+#### Small inline diagram — wrapfig
+
+When a diagram is small enough that wrapping text around it beats interrupting flow:
+
+```latex
+\begin{wrapfigure}{r}{0.4\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{figures/lec01/p07.png}
+  \caption{Short caption.}
+  \label{fig:lec01-p07}
+\end{wrapfigure}
+```
+
+`{r}` = right-placed (use `{l}` for left). Width `0.35–0.45\linewidth` works well inside a multicol column. `wrapfig` requires `\usepackage{wrapfig}` in `preamble.tex` — add it if not present.
+
+**Do not use wrapfig for:** diagrams with many labels, figures the reader needs to study carefully, or any figure wider than `0.5\linewidth`.
+
+#### Wide tables — the only case for breaking out of multicols
+
+Figures **never** need to break out of multicols. Only genuinely full-page-wide **tables** do:
+
+```latex
+\end{multicols}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\adjustbox{max width=\linewidth}{\begin{tabular}{...}
+...
+\end{tabular}}
+\caption{...}
+\label{tab:...}
+\end{table}
+
+\begin{multicols}{2}
+```
+
+- `\footnotesize` inside every table — always, regardless of content.
+- `\adjustbox{max width=\linewidth}` prevents table from overflowing the text block.
+- Resume `\begin{multicols}{2}` immediately after `\end{table}`.
 
 ### Two-column chapter structure
 
@@ -212,13 +296,15 @@ One chapter per trigger. Confirm source PDF before writing.
 % Source: lecture-slide-filename.pdf
 
 \begin{multicols}{2}
+\raggedcolumns
 
-% ... all section/subsection content here ...
+% ... all section/subsection/figure content here ...
 
 \end{multicols}
 ```
 
-Wide elements (full-page tables, wide figures): temporarily exit multicols as described above.
+- `\raggedcolumns` prevents multicol from stretching column content to equalize heights — keeps layout tight.
+- Figures stay inside multicols. Tables that need full width break out (see above).
 
 ### Build verification after each chapter
 
@@ -305,6 +391,6 @@ pdftoppm -f <n> -l <n> -r 100 build/main.pdf /tmp/out -png
 - **Symlink + latexmk:** `-output-directory` on a symlinked path confuses latexmk. Always keep `build/` inside the dotfile target (not the WDIR symlink side) — current layout is safe.
 - **TEXINPUTS:** if `kpsewhich wlltex0.sty` returns empty, `wll*.sty` won't resolve. Export `TEXINPUTS=$HOME/.config/tex//:` in shell or prepend to every latexmk call.
 - **Stale aux/toc/idx:** poisoned state causes layout corruption on subsequent passes. Symptom: bizarre chapter/section spacing or missing headers. Fix: nuke with `latexmk -C` then rebuild.
-- **`figure*` + multicol:** `figure*` is undefined inside the `multicol` environment. Use `\end{multicols}`, full-width figure, `\begin{multicols}{2}` instead.
+- **`figure*` + multicol:** `figure*` is undefined inside the `multicol` environment. Do not use it. Figures stay inside multicols at reduced width; only wide tables break out.
 - **`lecturenotes` option geometry:** wlltex0's `lecturenotes` mode sets its own geometry. The explicit `\geometry{...}` call in `main.tex` must come after `\usepackage{wlltex0}` to override it. Verify geometry is b5+landscape in the compiled PDF.
 - **`lecutre-sources` vs `lecture.sources`:** typo exists in some existing WDIR layouts. Propagate whichever spelling is already present; do not silently rename.
