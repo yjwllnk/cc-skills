@@ -7,6 +7,7 @@ Personal Claude Code skill bundle. Distributed via the plugin marketplace mechan
 | Skill | What it does |
 |---|---|
 | `postprocess-logs` | At end of every workflow, write `<WDIR>/logs/{session.jsonl,session.txt,summary.md,prompts.txt}`. Required step before declaring any non-trivial task complete. Handles both Claude Code transcripts and OpenAI Codex CLI rollouts. |
+| `pdf2willbook` | Convert PDF lecture notes into Will-format LaTeX book (B5 landscape, multicol, house style). Phase A scaffolds a new subject dir; Phase B fills chapters one at a time with exact transcription + vision figure extraction. |
 
 ## Install on a new machine
 
@@ -67,7 +68,9 @@ cc-skills/
 │   ├── marketplace.json
 │   └── plugin.json
 ├── skills/
-│   └── postprocess-logs/
+│   ├── postprocess-logs/
+│   │   └── SKILL.md
+│   └── pdf2willbook/
 │       └── SKILL.md
 └── README.md
 ```

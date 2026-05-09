@@ -1,7 +1,7 @@
 {
   "name": "cc-skills",
-  "version": "0.2.0",
-  "description": "Personal skill bundle. Currently ships postprocess-logs (writes session.jsonl + session.txt + summary.md + prompts.txt into <WDIR>/logs/ at end of every workflow). Works for Claude Code and OpenAI Codex CLI sessions.",
+  "version": "0.3.0",
+  "description": "Personal skill bundle. postprocess-logs: writes session logs at end of every workflow. pdf2willbook: converts PDF lecture notes to Will-format LaTeX book (B5 landscape, multicol, vision figure extraction).",
   "author": {
     "name": "yjwllnk",
     "url": "https://github.com/yjwllnk"
