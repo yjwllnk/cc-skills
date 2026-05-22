@@ -25,7 +25,7 @@ Skip only if:
 
 1. `WDIR` — the working directory for this session. Common roots: `$HOME/.claude-dnjf/WDIR/<name>/`, `$HOME/.claude-mdil/WDIR/<name>/`, or any path the user has been writing into during a Codex run. If unset, ask the user or infer from where you have been writing files this session.
 2. `SESSION_JSONL` — the raw transcript file for the current session. Read in place — it is never copied into `logs/`. Resolve based on host:
-   - Claude Code: most recently modified `*.jsonl` under `$HOME/.claude-dnjf/projects/-home-jinvk--claude-dnjf/` (or the matching project slug for `.claude-mdil`).
+   - Claude Code: most recently modified `*.jsonl` under `<config-dir>/projects/<cwd-slug>/` — the converter globs every `.claude-*` config dir (`$HOME/.llm/.claude-*/projects/*/` and `$HOME/.claude-*/projects/*/`) and every project slug, so this resolves automatically.
    - Codex CLI: most recently modified `rollout-*.jsonl` under `$HOME/.codex/sessions/`.
 
    If unsure which host you are running under, list candidates from both roots with `ls -t ... | head` and pick the file whose mtime matches this session's start; confirm with the user if ambiguous.
@@ -38,10 +38,12 @@ WDIR="<resolved working dir>"          # e.g. $HOME/.claude-dnjf/WDIR/cluster-hw
 
 # Pick whichever line matches the active host. Override SESSION_JSONL manually
 # if the auto-pick is wrong (e.g. multiple agents running at once).
-CLAUDE_PROJ_DIR="$HOME/.claude-dnjf/projects/-home-jinvk--claude-dnjf"
 CODEX_SESS_DIR="$HOME/.codex/sessions"
 
-claude_latest="$(ls -t "$CLAUDE_PROJ_DIR"/*.jsonl 2>/dev/null | head -1)"
+# Claude Code stores transcripts at <config-dir>/projects/<cwd-slug>/*.jsonl.
+# Glob every .claude-* config dir (both ~/.llm/.claude-* and ~/.claude-*) and
+# every project slug, so this resolves regardless of which host dir is active.
+claude_latest="$(ls -t "$HOME"/.llm/.claude-*/projects/*/*.jsonl "$HOME"/.claude-*/projects/*/*.jsonl 2>/dev/null | head -1)"
 codex_latest="$(find "$CODEX_SESS_DIR" -type f -name 'rollout-*.jsonl' -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)"
 
 # Default: pick the newest of the two (covers both Claude and Codex hosts).
@@ -203,7 +205,6 @@ Verify with `ls -la "$WDIR/logs/"` and `head -40 "$WDIR/logs/session.txt"` befor
 ## Notes
 
 - The CLAUDE.md / AGENTS.md in `WDIR/` only contains a one-line pointer to this skill. Full procedure lives here so it does not load on every turn.
-- Memory file `feedback_postprocess_logs.md` reminds you this is required. Do not remove it.
 - `session.txt` is full fidelity — nothing is truncated, so the file can be large. That is intended: it is now the only record of the run (no raw jsonl is kept).
 - Assistant thinking: Claude Code does **not** persist extended-thinking plaintext to its transcript (it keeps only a cryptographic `signature`), so for Claude Code runs `session.txt` shows `[thinking — not persisted by Claude Code; signature only]` markers — the reasoning text is unrecoverable post-hoc. Codex CLI rollouts do record `reasoning` items, so Codex thinking is captured in full.
 - `SESSION_JSONL` is read in place, never copied. The host agent keeps its own copy under `$HOME/.claude*/projects/` or `$HOME/.codex/sessions/` if the raw transcript is ever needed.
