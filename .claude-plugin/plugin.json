@@ -1,7 +1,7 @@
 {
   "name": "cc-skills",
-  "version": "0.3.1",
-  "description": "Personal skill bundle. postprocess-logs: writes session logs at end of every workflow. pdf2willbook: converts PDF lecture notes to Will-format LaTeX book (B5 landscape, multicol, vision figure extraction).",
+  "version": "0.4.0",
+  "description": "Personal skill bundle. postprocess-logs: writes a single full-fidelity session.txt at end of every workflow. pdf2willbook: converts PDF lecture notes to Will-format LaTeX book (B5 landscape, multicol, vision figure extraction).",
   "author": {
     "name": "yjwllnk",
     "url": "https://github.com/yjwllnk"
