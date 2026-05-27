@@ -9,7 +9,7 @@ Convert PDF lecture notes into a structured LaTeX book following Will's house st
 
 **Companion file:** [`wlltex0-cheatsheet.md`](./wlltex0-cheatsheet.md) — macros, environments, math helpers from `wlltex0.sty`/`wllMDIL.sty`. Read it before transcribing chapters.
 
-**Account context:** the user's personal Claude Code account is `~/.claude-dnjf` — that's where `WDIR/study-session/` lives and where this skill is normally used. The work-account `~/.claude-mdil` exists but study-session is not active there. Both accounts have this skill installed; only `.claude-dnjf` actively uses it.
+**Account context:** the user's personal Claude Code account is `~/.claude-dnjf` — that's where `WDIR/study-session/` lives and where this skill is normally used. The work-account `~/.claude-mdil` exists but study-session is not active there. A Codex CLI account also exists at `~/.llm/.openai-dnjf` (`CODEX_HOME=~/.llm/.openai-dnjf/.codex`); when invoked from Codex, the WDIR root is `~/.llm/.openai-dnjf/WDIR/study-session/<subject-name>/` instead — substitute that everywhere the layout below says `~/.claude-dnjf/WDIR/...`. The dotfile target under `~/.dnlf/__mdil__/notes/...` is host-agnostic and shared across all three accounts. All three have this skill installed; only `.claude-dnjf` (or its Codex sibling) actively uses it.
 
 ---
 
